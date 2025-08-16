@@ -19,7 +19,25 @@ const Appointment = () => {
 </svg>
              Medi Plus</h1>
 
-        <img src={success} className='w-40 h-full  rounded-full'/>
+        <img src={success} className='w-40 h-full  rounded-full py-8'/>
+
+        <p className='text-2xl text-gray-100 font-semibold'>Your <span className='text-green-600'>appointment</span> request has <br /> been successfully submitted!</p>
+        <p className='py-4 text-[rgb(121,123,127)] text-sm'>We'll be in touch shortly to confirm.</p>
+
+        <div className="appointment-details-section  flex items-center justify-center gap-4 px-4  border-[rgba(121,123,127,0.28)] border-t border-b text-[rgb(121,123,127)] py-2">
+          <p>Requested appointment details:</p>
+          <div className="doctor-details flex items-center gap-2">
+            <div className="doc-profile w-8 h-8 rounded-full flex items-center justify-center text-[rgb(121,123,127)] bg-gray-800 text-xs">HB</div>
+            <p>Dr. Harshit Bhardwaj</p>
+          </div>
+          <div className="appointment-schedule flex items-center gap-2 ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+            <p>Aug 16, 2025, 2:20PM</p>
+          </div>
+        </div>
+
+      <button className='bg-[rgb(28,141,100)] py-3 text-gray-300 font-medium rounded-md text-xs my-4 px-4 hover:bg-[rgba(28,141,100,0.89)] transition-all' onClick={()=> setIsSuccess(false)}>New Appointment</button>
+        
 
     </div>
     </>):(
