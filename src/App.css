@@ -7,6 +7,24 @@
   box-sizing: border-box;
 }
 
+body{
+  background:rgb(19,21,25);
+}
+
 body::-webkit-scrollbar {
   width: 0px;
+}
+
+.bg-shadow {
+  position: relative;
+  z-index: 0;
+}
+
+.bg-shadow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.2); /* Inset black shadow */
+  z-index: -1;
 }

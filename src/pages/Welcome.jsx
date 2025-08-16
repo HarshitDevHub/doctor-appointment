@@ -12,7 +12,7 @@ const Welcome = (setIsWelcomePageIsOpen) => {
             </>
         ):(
         <>
-         <div className='main-container bg-cover bg-center min-h-screen bg-fixed' style={{ backgroundImage: `url(${bg2})` }}>
+         <div className='main-container bg-cover bg-center min-h-screen bg-fixed bg-shadow' style={{ backgroundImage: `url(${bg2})` }}>
          <div className="form-area bg-[rgb(19,21,25)] w-2/3 pb-8 min-h-screen">
             
              <h1 className='font-medium text-white text-xl flex items-center pt-6 px-10'><svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import bg2 from '../assets/bg-2.jpg'
 import success from '../assets/check.png'
+import { motion } from 'framer-motion';
 
 
 const Appointment = () => {
@@ -10,39 +11,98 @@ const Appointment = () => {
 
     {isSuccess ? (
     <>
-    <div className="success-area bg-[rgb(19,21,25)] w-full min-h-screen flex items-center flex-col">
 
-        <h1 className='font-medium text-white text-xl flex items-center pt-10 px-10'><svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-  <path d="M11 9a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z"/>
-  <path fill-rule="evenodd" d="M9.896 3.051a2.681 2.681 0 0 1 4.208 0c.147.186.38.282.615.255a2.681 2.681 0 0 1 2.976 2.975.681.681 0 0 0 .254.615 2.681 2.681 0 0 1 0 4.208.682.682 0 0 0-.254.615 2.681 2.681 0 0 1-2.976 2.976.681.681 0 0 0-.615.254 2.682 2.682 0 0 1-4.208 0 .681.681 0 0 0-.614-.255 2.681 2.681 0 0 1-2.976-2.975.681.681 0 0 0-.255-.615 2.681 2.681 0 0 1 0-4.208.681.681 0 0 0 .255-.615 2.681 2.681 0 0 1 2.976-2.975.681.681 0 0 0 .614-.255ZM12 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" clip-rule="evenodd"/>
-  <path d="M5.395 15.055 4.07 19a1 1 0 0 0 1.264 1.267l1.95-.65 1.144 1.707A1 1 0 0 0 10.2 21.1l1.12-3.18a4.641 4.641 0 0 1-2.515-1.208 4.667 4.667 0 0 1-3.411-1.656Zm7.269 2.867 1.12 3.177a1 1 0 0 0 1.773.224l1.144-1.707 1.95.65A1 1 0 0 0 19.915 19l-1.32-3.93a4.667 4.667 0 0 1-3.4 1.642 4.643 4.643 0 0 1-2.53 1.21Z"/>
-</svg>
-             Medi Plus</h1>
+<motion.div
+  initial={{ opacity: 0, y: 0 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6, ease: 'easeOut' }}
+  className="success-area bg-[rgb(19,21,25)] w-full min-h-screen flex items-center flex-col justify-center"
+>
+  <motion.h1
+    className="font-medium text-white text-xl flex items-center pt-10 px-10"
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.2 }}
+  >
+    <svg
+      className="w-6 h-6 text-gray-800 dark:text-white mr-2"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path d="M11 9a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z" />
+      <path
+        fillRule="evenodd"
+        d="M9.896 3.051a2.681 2.681 0 0 1 4.208 0c.147.186.38.282.615.255a2.681 2.681 0 0 1 2.976 2.975.681.681 0 0 0 .254.615 2.681 2.681 0 0 1 0 4.208.682.682 0 0 0-.254.615 2.681 2.681 0 0 1-2.976 2.976.681.681 0 0 0-.615.254 2.682 2.682 0 0 1-4.208 0 .681.681 0 0 0-.614-.255 2.681 2.681 0 0 1-2.976-2.975.681.681 0 0 0-.255-.615 2.681 2.681 0 0 1 0-4.208.681.681 0 0 0 .255-.615 2.681 2.681 0 0 1 2.976-2.975.681.681 0 0 0 .614-.255ZM12 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
+        clipRule="evenodd"
+      />
+      <path d="M5.395 15.055 4.07 19a1 1 0 0 0 1.264 1.267l1.95-.65 1.144 1.707A1 1 0 0 0 10.2 21.1l1.12-3.18a4.641 4.641 0 0 1-2.515-1.208 4.667 4.667 0 0 1-3.411-1.656Zm7.269 2.867 1.12 3.177a1 1 0 0 0 1.773.224l1.144-1.707 1.95.65A1 1 0 0 0 19.915 19l-1.32-3.93a4.667 4.667 0 0 1-3.4 1.642 4.643 4.643 0 0 1-2.53 1.21Z" />
+    </svg>
+    Medi Plus
+  </motion.h1>
 
-        <img src={success} className='w-40 h-full  rounded-full py-8'/>
+  <motion.img
+    src={success}
+    className="w-40 h-full rounded-full py-8"
+    initial={{ scale: 0 }}
+    animate={{ scale: 1 }}
+    transition={{ type: 'spring', stiffness: 80, delay: 0.4 }}
+  />
 
-        <p className='text-2xl text-gray-100 font-semibold'>Your <span className='text-green-600'>appointment</span> request has <br /> been successfully submitted!</p>
-        <p className='py-4 text-[rgb(121,123,127)] text-sm'>We'll be in touch shortly to confirm.</p>
+  <motion.p
+    className="text-2xl text-gray-100 font-semibold text-center px-4"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.6 }}
+  >
+    Your <span className="text-green-600">appointment</span> request has <br /> been successfully submitted!
+  </motion.p>
 
-        <div className="appointment-details-section  flex items-center justify-center gap-4 px-4  border-[rgba(121,123,127,0.28)] border-t border-b text-[rgb(121,123,127)] py-2">
-          <p>Requested appointment details:</p>
-          <div className="doctor-details flex items-center gap-2">
-            <div className="doc-profile w-8 h-8 rounded-full flex items-center justify-center text-[rgb(121,123,127)] bg-gray-800 text-xs">HB</div>
-            <p>Dr. Harshit Bhardwaj</p>
-          </div>
-          <div className="appointment-schedule flex items-center gap-2 ">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
-            <p>Aug 16, 2025, 2:20PM</p>
-          </div>
-        </div>
+  <motion.p
+    className="py-4 text-[rgb(121,123,127)] text-sm"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ delay: 0.8 }}
+  >
+    We'll be in touch shortly to confirm.
+  </motion.p>
 
-      <button className='bg-[rgb(28,141,100)] py-3 text-gray-300 font-medium rounded-md text-xs my-4 px-4 hover:bg-[rgba(28,141,100,0.89)] transition-all' onClick={()=> setIsSuccess(false)}>New Appointment</button>
-        
-
+  <motion.div
+    className="appointment-details-section flex items-center justify-center gap-4 px-4 border-[rgba(121,123,127,0.28)] border-t border-b text-[rgb(121,123,127)] py-2"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 1 }}
+  >
+    <p>Requested appointment details:</p>
+    <div className="doctor-details flex items-center gap-2">
+      <div className="doc-profile w-8 h-8 rounded-full flex items-center justify-center text-[rgb(121,123,127)] bg-gray-800 text-xs">HB</div>
+      <p>Dr. Harshit Bhardwaj</p>
     </div>
+    <div className="appointment-schedule flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-icon lucide-calendar">
+        <path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" />
+      </svg>
+      <p>Aug 16, 2025, 2:20PM</p>
+    </div>
+  </motion.div>
+
+  <motion.button
+    className="bg-[rgb(28,141,100)] py-3 text-gray-300 font-medium rounded-md text-xs my-4 px-4 hover:bg-[rgba(28,141,100,0.89)] transition-all"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 1 }}
+    onClick={() => setIsSuccess(false)}
+  >
+    New Appointment
+  </motion.button>
+</motion.div>
+
     </>):(
         <>
-        <div className='main-container bg-cover bg-center min-h-screen bg-fixed' style={{ backgroundImage: `url(${bg2})` }}>
+        <div className='main-container bg-cover bg-center min-h-screen bg-fixed bg-shadow' style={{ backgroundImage: `url(${bg2})` }}>
 
    <div className="form-area bg-[rgb(19,21,25)] w-2/3 pb-8 min-h-screen">
 
