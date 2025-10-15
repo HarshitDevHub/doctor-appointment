@@ -7,6 +7,15 @@
   box-sizing: border-box;
 }
 
+input:-webkit-autofill {
+  background-color: transparent !important; /* or your preferred color */
+  color: #fff !important;            /* text color */
+  transition: background-color 5000s ease-in-out 0s; /* Prevent flashing */
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #fff; /* optional: set cursor color */
+}
+
+
 body{
   background:rgb(19,21,25);
 }
@@ -27,4 +36,11 @@ body::-webkit-scrollbar {
   background: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
   box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.2); /* Inset black shadow */
   z-index: -1;
+}
+
+.error-text{
+  color:red;
+}
+.error-inp{
+  border:1px solid red;
 }

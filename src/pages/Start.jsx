@@ -1,7 +1,89 @@
-import React from 'react'
+import React, { useState } from 'react'
 import bg from '../assets/bg.jpg'
+import axios from 'axios'
+import { useUser } from '../context/UserContext'
+import toast from 'react-hot-toast'
 
+const server_url = 'http://localhost:3000'
 const Start = ({setIsWelcomePageIsOpen, setIsAppointmentPageIsOpen}) => {
+
+  const {userData, setUserData} =useUser();
+
+  const [formData, setFormData] = useState({
+    name:'',
+    email:'',
+    phoneNumber:''
+  })
+  const [errors, setErrors] = useState({})
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleonchange = (e)=>{
+    // setErrors({});
+    setErrors({...errors, [e.target.name]:''})
+    setFormData({...formData, [e.target.name]:e.target.value})
+
+  }
+
+   const validate = () => {
+  let tempErrors = {};
+
+  if (!formData.name) {
+    tempErrors.name = '*Name is required';
+  }
+
+  if (!formData.email) {
+    tempErrors.email = '*Email is required';
+  } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    // toast.error("Invalid Email Format");
+    tempErrors.email = '*Email is invalid';
+  }
+
+  if (!formData.phoneNumber) {
+    tempErrors.phoneNumber = '*Mobile number is required';
+  } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
+    // toast.error("Invalid Mobile Number");
+    tempErrors.phoneNumber = '*Mobile number must be 10 digits';
+  }
+
+  setErrors(tempErrors);
+
+  // Return true if there are no errors
+  return Object.keys(tempErrors).length === 0;
+};
+
+
+  const handleFormSubmit = async (e)=>{
+    e.preventDefault();
+    if (validate()) {
+
+      try {
+        setIsLoading(true)
+         const response = await axios.post(`${server_url}/register`,formData)
+
+      if (!response.data.success) {
+        setIsLoading(false)
+        toast.error(response.data.message)
+        return console.log({message:response.data.message})
+      }
+
+
+      console.log(response.data)
+      setUserData(response.data.user)
+      toast.success("One Step Ahead")
+      return setIsWelcomePageIsOpen(true)
+
+
+      } catch (error) {
+        setIsLoading(false)
+        toast.error("Internal Server Error")
+        console.error("Internal Server Error",error)
+      }
+
+     
+    }else{
+      console.log(errors)
+    }
+  }
   
   return (
     <div className='main-contaoner flex min-h-screen'>
@@ -9,9 +91,9 @@ const Start = ({setIsWelcomePageIsOpen, setIsAppointmentPageIsOpen}) => {
 
       <div className="form-area basis-2/4 bg-[rgb(19,21,25)] relative">
 
-      <h1 className='font-medium text-white text-xl flex items-center pt-20 px-10'><svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+      <h1 className='font-medium text-white text-xl flex items-center pt-20 px-10'><svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
   <path d="M11 9a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z"/>
-  <path fill-rule="evenodd" d="M9.896 3.051a2.681 2.681 0 0 1 4.208 0c.147.186.38.282.615.255a2.681 2.681 0 0 1 2.976 2.975.681.681 0 0 0 .254.615 2.681 2.681 0 0 1 0 4.208.682.682 0 0 0-.254.615 2.681 2.681 0 0 1-2.976 2.976.681.681 0 0 0-.615.254 2.682 2.682 0 0 1-4.208 0 .681.681 0 0 0-.614-.255 2.681 2.681 0 0 1-2.976-2.975.681.681 0 0 0-.255-.615 2.681 2.681 0 0 1 0-4.208.681.681 0 0 0 .255-.615 2.681 2.681 0 0 1 2.976-2.975.681.681 0 0 0 .614-.255ZM12 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" clip-rule="evenodd"/>
+  <path fillRule="evenodd" d="M9.896 3.051a2.681 2.681 0 0 1 4.208 0c.147.186.38.282.615.255a2.681 2.681 0 0 1 2.976 2.975.681.681 0 0 0 .254.615 2.681 2.681 0 0 1 0 4.208.682.682 0 0 0-.254.615 2.681 2.681 0 0 1-2.976 2.976.681.681 0 0 0-.615.254 2.682 2.682 0 0 1-4.208 0 .681.681 0 0 0-.614-.255 2.681 2.681 0 0 1-2.976-2.975.681.681 0 0 0-.255-.615 2.681 2.681 0 0 1 0-4.208.681.681 0 0 0 .255-.615 2.681 2.681 0 0 1 2.976-2.975.681.681 0 0 0 .614-.255ZM12 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" clipRule="evenodd"/>
   <path d="M5.395 15.055 4.07 19a1 1 0 0 0 1.264 1.267l1.95-.65 1.144 1.707A1 1 0 0 0 10.2 21.1l1.12-3.18a4.641 4.641 0 0 1-2.515-1.208 4.667 4.667 0 0 1-3.411-1.656Zm7.269 2.867 1.12 3.177a1 1 0 0 0 1.773.224l1.144-1.707 1.95.65A1 1 0 0 0 19.915 19l-1.32-3.93a4.667 4.667 0 0 1-3.4 1.642 4.643 4.643 0 0 1-2.53 1.21Z"/>
 </svg>
 Medi Plus</h1>
@@ -23,45 +105,45 @@ Medi Plus</h1>
 
       <div className="imp-wrap flex flex-col w-full  gap-2 pb-4">
 
-        <label htmlFor="name" className='text-[rgb(121,123,127)] text-xs'>Full name</label>
-        <div className="inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md">
-          <svg class="w-6 h-6 ml-2 text-gray-800 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <path stroke="currentColor" stroke-width="2" d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+        <label htmlFor="name" className='text-[rgb(121,123,127)] text-xs flex justify-between'>Full name <span className='text-[0.5rem] text-red-700'>{errors.name}</span></label>
+        <div className={`inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md ${errors.name && 'border-red-500 border'}`}>
+          <svg className="w-6 h-6 ml-2 text-gray-800 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" strokeWidth="2" d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
 </svg>
 
-        <input type="text" className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Your name here'/>
+        <input onChange={handleonchange} name='name' type="text" className={`bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600 $`} placeholder='Your name here'/>
         </div>
       </div>
 
       <div className="imp-wrap flex flex-col w-full  gap-2 pb-4">
 
-        <label htmlFor="name" className='text-[rgb(121,123,127)] text-xs'>Email</label>
-        <div className="inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md">
-          <svg class="w-6 h-6 ml-2 text-gray-800 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m3.5 5.5 7.893 6.036a1 1 0 0 0 1.214 0L20.5 5.5M4 19h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Z"/>
+        <label htmlFor="name" className='text-[rgb(121,123,127)] text-xs flex justify-between'>Email <span className='text-[0.5rem] text-red-700'>{errors.email}</span></label>
+        <div className={`inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md ${errors.email && 'border-red-500 border'}`}>
+          <svg className="w-6 h-6 ml-2 text-gray-800 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="m3.5 5.5 7.893 6.036a1 1 0 0 0 1.214 0L20.5 5.5M4 19h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Z"/>
 </svg>
 
-        <input type="email" className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Your email here'/>
+        <input onChange={handleonchange} name='email' type="email" className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Your email here'/>
         </div>
       </div>
 
 
       <div className="imp-wrap flex flex-col w-full  gap-2 pb-4">
 
-        <label htmlFor="name" className='text-[rgb(121,123,127)] text-xs'>Phone number</label>
-        <div className="inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md">
-          <svg class="w-6 h-6 ml-2 text-gray-800 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.427 14.768 17.2 13.542a1.733 1.733 0 0 0-2.45 0l-.613.613a1.732 1.732 0 0 1-2.45 0l-1.838-1.84a1.735 1.735 0 0 1 0-2.452l.612-.613a1.735 1.735 0 0 0 0-2.452L9.237 5.572a1.6 1.6 0 0 0-2.45 0c-3.223 3.2-1.702 6.896 1.519 10.117 3.22 3.221 6.914 4.745 10.12 1.535a1.601 1.601 0 0 0 0-2.456Z"/>
+        <label htmlFor="name" className='text-[rgb(121,123,127)] text-xs flex justify-between'>Phone number <span className='text-[0.5rem] text-red-700'>{errors.phoneNumber}</span></label>
+       <div className={`inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md ${errors.phoneNumber && 'border-red-500 border'}`}>
+          <svg className="w-6 h-6 ml-2 text-gray-800 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.427 14.768 17.2 13.542a1.733 1.733 0 0 0-2.45 0l-.613.613a1.732 1.732 0 0 1-2.45 0l-1.838-1.84a1.735 1.735 0 0 1 0-2.452l.612-.613a1.735 1.735 0 0 0 0-2.452L9.237 5.572a1.6 1.6 0 0 0-2.45 0c-3.223 3.2-1.702 6.896 1.519 10.117 3.22 3.221 6.914 4.745 10.12 1.535a1.601 1.601 0 0 0 0-2.456Z"/>
 </svg>
 
-        <input type="text" className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Your phone number here'/>
+        <input onChange={handleonchange} name='phoneNumber' type="text" className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Your phone number here'/>
         </div>
       </div>
 
 
       {/* submit btn */}
 
-      <button className='w-full bg-[rgb(28,141,100)] py-3 text-gray-300 font-medium rounded-md text-xs' onClick={()=>setIsWelcomePageIsOpen(true)}>Get Started</button>
+      <button className={`w-full bg-[rgb(28,141,100)] py-3 text-gray-300 font-medium rounded-md text-xs ${isLoading && 'scale-95'} transition-all`} onClick={handleFormSubmit} disabled={isLoading && true}> {isLoading ? "Working on it...":"Get Started"}</button>
   
 
 
@@ -71,7 +153,7 @@ Medi Plus</h1>
 
   <div className="footer-section absolute w-full bottom-0 flex items-center justify-between mx-10 pr-40">
       <p className='text-sm text-gray-600'>© 2025 CarePlus</p>
-      <p className='text-green-800 text-sm cursor-pointer'>Admin</p>
+      <a className='text-green-800 text-sm cursor-pointer' href='/admin'>Admin</a>
   </div>
 
       </div>

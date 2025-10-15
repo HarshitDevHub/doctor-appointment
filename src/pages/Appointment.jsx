@@ -2,10 +2,86 @@ import React, { useState } from 'react'
 import bg2 from '../assets/bg-2.jpg'
 import success from '../assets/check.png'
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
+import axios from 'axios';
+import { useUser } from '../context/UserContext';
+import { format } from 'date-fns';
 
+const server_url = 'http://localhost:3000'
 
 const Appointment = () => {
+    const {userData, setUserData} = useUser();
     const [isSuccess, setIsSuccess] = useState(false)
+    const [formData, setFormData] = useState({
+      email:userData.email,
+      doctor: '',
+      expectedAppointmentDate: '',
+      appointmentReason: '',
+      comment: '',
+    });
+    const [errors, setErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false)
+    const [result, setResult] = useState(null)
+
+
+    // Handling onchange function
+    const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    setErrors({...errors, [name]:''})
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+};
+
+
+
+    // Handling form submit
+
+    const handleFormSubmit = async() =>{
+
+       // ✅ Basic validation
+  const newErrors = {};
+  if (!formData.doctor.trim()) newErrors.doctor = "Doctor name is required.";
+  if (!formData.expectedAppointmentDate) newErrors.expectedAppointmentDate = "Date is required.";
+  if (!formData.appointmentReason.trim()) newErrors.appointmentReason = "Appointment reason is required.";
+  if (!formData.comment.trim()) newErrors.comment = "Comment is required.";
+
+   setErrors(newErrors);
+   console.log(errors)
+  if (Object.keys(newErrors).length > 0) return;
+
+  try {
+    setIsLoading(true)
+    const response = await axios.post(`${server_url}/doctor-appointment`,formData);
+
+    if (!response.data.success) {
+      setIsLoading(false)
+      return toast.error(response.data.message)
+    }
+
+    console.log(response.data)
+    setResult(response.data.appointment)
+    setFormData({
+      email:userData.email,
+      doctor: '',
+      expectedAppointmentDate: '',
+      appointmentReason: '',
+      comment: '',
+    })
+    setIsSuccess(true)
+    return setIsLoading(false)
+    // return alert('success')
+  } catch (error) {
+    setIsLoading(false)
+    alert("Internal Server Error")
+    return console.error("Internal Server Error",error)
+
+  }
+
+    }
+
   return (
     <>
 
@@ -79,13 +155,13 @@ const Appointment = () => {
     <p>Requested appointment details:</p>
     <div className="doctor-details flex items-center gap-2">
       <div className="doc-profile w-8 h-8 rounded-full flex items-center justify-center text-[rgb(121,123,127)] bg-gray-800 text-xs">HB</div>
-      <p>Dr. Harshit Bhardwaj</p>
+      <p>{result && result.doctor}</p>
     </div>
     <div className="appointment-schedule flex items-center gap-2">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-icon lucide-calendar">
         <path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" />
       </svg>
-      <p>Aug 16, 2025, 2:20PM</p>
+      <p>{result && format(result.expectedAppointmentDate, "d MMM yyyy, h:mma")}</p>
     </div>
   </motion.div>
 
@@ -122,22 +198,35 @@ const Appointment = () => {
 
         <div className="imp-wrap flex flex-col w-full  gap-2 pb-4">
 
-        <label htmlFor="name" className='text-[rgb(121,123,127)] text-xs'>Doctor</label>
-        <div className="inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md">
-        <input type="text" className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Select a Doctor'/>
+        <label htmlFor="name" className={`text-[rgb(121,123,127)] text-xs ${errors.doctor && 'text-red-700'}`}>Select Doctor</label>
+        <div className={`inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md ${errors.doctor && 'border-red-700'}`}>
+        <select
+        name="doctor"
+        value={formData.doctor}  // <-- assuming you're using state to control it
+        onChange={handleInputChange}
+        className={`bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600`}
+      >
+        <option value="">Select a Doctor</option>
+        <option value="Dr. Harshit Bhardwaj">Dr. Harshit</option>
+        <option value="Dr. Shreya">Dr. Shreya</option>
+        <option value="Dr. Aaradhya">Dr. Aaradhya</option>
+        <option value="Dr. Aryan">Dr. Aryan</option>
+        <option value="Dr. Rohan">Dr. Rohan</option>
+      </select>
+
         </div>
         </div>
 
          <div className="imp-wrap flex flex-col w-full  gap-2 pb-4">
 
-        <label htmlFor="name" className='text-[rgb(121,123,127)] text-xs'>Expected appointment date</label>
-        <div className="inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md">
+        <label htmlFor="name" className={`text-[rgb(121,123,127)] text-xs ${errors.expectedAppointmentDate && 'text-red-700'}`}>Expected appointment date</label>
+        <div className={`inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md ${errors.expectedAppointmentDate && 'border-red-700'}`}>
           <svg class="w-6 h-6 ml-2 text-gray-800 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/>
 
 </svg>
 
-        <input type="datetime-local" className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Ram Charan'/>
+        <input type="datetime-local" value={formData.expectedAppointmentDate} onChange={handleInputChange} name='expectedAppointmentDate' className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Ram Charan'/>
         </div>
          </div>
 
@@ -145,26 +234,26 @@ const Appointment = () => {
 
                      <div className="imp-wrap flex flex-col w-full  gap-2 pb-4">
 
-        <label htmlFor="name" className='text-[rgb(121,123,127)] text-xs'>Appointment reason</label>
-        <div className="inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md">
+        <label htmlFor="name" className={`text-[rgb(121,123,127)] text-xs ${errors.appointmentReason && 'text-red-700'}`}>Appointment reason</label>
+        <div className={`inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md ${errors.appointmentReason && 'border-red-700'}`}>
          
-        <textarea type="text" className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Monthly checkup'></textarea>
+        <textarea type="text" value={formData.appointmentReason} onChange={handleInputChange} name='appointmentReason' className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Monthly checkup'></textarea>
         </div>
                      </div>
 
                      <div className="imp-wrap flex flex-col w-full  gap-2 pb-4">
 
-        <label htmlFor="name" className='text-[rgb(121,123,127)] text-xs'>Comment/notes</label>
-        <div className="inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md">
+        <label htmlFor="name" className={`text-[rgb(121,123,127)] text-xs ${errors.comment && 'text-red-700'}`}>Comment/notes</label>
+        <div className={`inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md ${errors.comment && 'border-red-700'}`}>
          
 
-        <textarea type="text" className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Prefer afternoon'></textarea>
+        <textarea type="text" name='comment' value={formData.comment} onChange={handleInputChange} className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Prefer afternoon'></textarea>
         </div>
                     </div>
          </div>
 
 
-      <button className='w-full bg-[rgb(28,141,100)] py-3 text-gray-300 font-medium rounded-md text-xs my-4' onClick={()=> setIsSuccess(true)}>Submit Appointment</button>
+      <button className='w-full bg-[rgb(28,141,100)] py-3 text-gray-300 font-medium rounded-md text-xs my-4' onClick={handleFormSubmit}>{isLoading ? 'Getting Ready...':'Submit Appointment'}</button>
 
 
 
