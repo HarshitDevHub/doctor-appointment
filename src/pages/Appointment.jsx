@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useUser } from '../context/UserContext';
 import { format } from 'date-fns';
 
-const server_url = 'http://localhost:3000'
+const server_url = 'https://doctor-appointment-by6x.onrender.com'|| 'http://localhost:3000'
 
 const Appointment = () => {
     const {userData, setUserData} = useUser();

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 
-const server_url = 'http://localhost:3000'
+const server_url = 'https://doctor-appointment-by6x.onrender.com'||'http://localhost:3000'
 
 const Admin = () => {
   const [appointmentScheduleBox, setAppointmentScheduleBox] = useState(false)

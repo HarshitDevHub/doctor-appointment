@@ -4,7 +4,7 @@ import axios from 'axios'
 import { useUser } from '../context/UserContext'
 import toast from 'react-hot-toast'
 
-const server_url = 'http://localhost:3000'
+const server_url = 'https://doctor-appointment-by6x.onrender.com' ||'http://localhost:3000'
 const Start = ({setIsWelcomePageIsOpen, setIsAppointmentPageIsOpen}) => {
 
   const {userData, setUserData} =useUser();
