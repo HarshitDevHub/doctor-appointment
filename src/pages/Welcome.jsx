@@ -9,7 +9,7 @@ import toast from 'react-hot-toast'
 
 const server_url = 'http://localhost:3000'
 
-const Welcome = (setIsWelcomePageIsOpen) => {
+const Welcome = (setIsWelcomePageIsOpen) => { 
   const [isAppointmentPageIsOpen, setIsAppointmentPageIsOpen] = useState(false)
   const {userData, setUserData} = useUser();
   const [userDetails, setUserDetails] = useState({

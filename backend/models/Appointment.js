@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 
 const appointmentSchema = new mongoose.Schema({
-  userEmail: {
-    type: String,
-    required: true, // Store email for quick access
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', // Reference to the User model
+    required: true,
   },
   doctor: {
     type: String,
@@ -18,6 +19,14 @@ const appointmentSchema = new mongoose.Schema({
     required: true,
   },
   comments: {
+    type: String,
+    default: null,
+  },
+  status:{
+    type: String,
+    default:'Pending',
+  },
+  cancelReason:{
     type: String,
     default: null,
   },

@@ -1,6 +1,97 @@
-import React from 'react'
+import axios from 'axios'
+import { format, parseISO } from "date-fns";
+import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+
+
+const server_url = 'http://localhost:3000'
 
 const Admin = () => {
+  const [appointmentScheduleBox, setAppointmentScheduleBox] = useState(false)
+  const [appointmentCancelBox, setAppointmentCancelBox] = useState(false)
+  const [appointments, setAppointments] = useState([])
+  const [appointmentData, setAppointmentData] = useState(null)
+
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [])
+
+  useEffect(() => {
+  if (appointmentScheduleBox || appointmentCancelBox) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = 'auto';
+  }
+}, [appointmentScheduleBox, appointmentCancelBox]);
+
+  
+
+  // handling model box logic
+  
+  
+  const handleModelBox = (e, data) => {
+    e.preventDefault();
+    setAppointmentData(data)
+    if (e.target.innerText == 'Approve') {
+      setAppointmentScheduleBox(true)
+    } else {
+      setAppointmentCancelBox(true)
+    }
+  }
+
+  // fetching appointments list
+
+  const fetchAppointments = async()=>{
+    try {
+      const response = await axios.get(`${server_url}/fetch-appointment-list`)
+
+      if (!response.data.success) {
+        return toast.error(response.data.message)
+      }
+      setAppointments(response.data.appointments)
+
+      setTimeout(() => {
+        fetchAppointments();
+      }, 5000);
+      return console.log(response.data)
+    } catch (error) {
+      console.error("Internal Server Error")
+      toString.error("Internal Server Error")
+    }
+  }
+
+  const handleAppointmentCancel = async()=>{
+    try {
+      const response = await axios.put(`${server_url}/approve-appointment`,{appointmentData,action:'cancel'})
+      // console.log(response.data)
+      if (!response.data.success) {
+        return toast.error(response.data.message)
+      }
+      fetchAppointments()
+       setAppointmentCancelBox(false)
+      return toast.success(response.data.message)
+    } catch (error) {
+      console.error("Internal Server Error")
+      toast.error("Internal Server Error")
+    }
+  }
+
+  const handleAppointmentApprove = async() =>{
+     try {
+      const response = await axios.put(`${server_url}/approve-appointment`,{appointmentData,action:'approve'})
+      if(!response.data.success){
+        return axios.error(response.data.message)
+      }
+        fetchAppointments()
+       setAppointmentScheduleBox(false)
+      return toast.success("Appoint Approved!!")
+    } catch (error) {
+      toast.error("Internal Server Error")
+      console.error("Internal Server Error")
+    }
+  }
+
   return (
     <div className='main-container min-h-screen w-full !bg-[#131519]'>
 
@@ -115,8 +206,39 @@ const Admin = () => {
     </thead>
     <tbody className="divide-y divide-[#2e3136]">
 
+      {appointments.map((data,index) => (
+        <tr className="hover:bg-[#2a2d31]/60 transition-colors">
+        <td className="px-6 py-4">{index+1}.</td>
+        <td className="px-6 py-4 font-normal text-white">{data.userId.fullName}</td>
+        <td className="px-6 py-4">
+          <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${data.status === 'Pending' ? 'bg-blue-600/20 text-blue-400': data.status === 'Scheduled' ? 'bg-green-600/20 text-green-400': data.status === 'Canceled' ? 'bg-red-600/20 text-red-400':''}`}>
+
+            <span
+  className={`w-2 h-2 rounded-full ${
+    data.status === 'Pending'
+      ? 'bg-blue-400'
+      : data.status === 'Scheduled'
+      ? 'bg-green-400'
+      : data.status === 'Canceled'
+      ? 'bg-red-400'
+      : '' // default case, in case none of the conditions are met
+  }`}
+/>
+            {data.status}
+          </span>
+        </td>
+        <td className="px-6 py-4">{format(data.expectedAppointmentDate, "d MMM yyyy, h:mma")}</td>
+        <td className="px-6 py-4">{data.doctor}</td>
+        <td className="px-6 py-4 text-center">
+          <button onClick={(e)=> handleModelBox(e,data)} className={`${data.status === 'Pending' ? 'text-green-400 hover:text-green-500':'text-red-400 hover:text-red-500'} text-xs font-semibold tracking-wide transition-colors`}>
+            {data.status === "Pending" ? 'Approve': data.status ==='Scheduled' ? 'Cancel':''}
+          </button>
+        </td>
+      </tr>
+      ))}
+
       {/* Scheduled row */}
-      <tr className="hover:bg-[#2a2d31]/60 transition-colors">
+      {/* <tr className="hover:bg-[#2a2d31]/60 transition-colors">
         <td className="px-6 py-4">1.</td>
         <td className="px-6 py-4 font-normal text-white">Ansh</td>
         <td className="px-6 py-4">
@@ -132,10 +254,10 @@ const Admin = () => {
             Cancel
           </button>
         </td>
-      </tr>
+      </tr> */}
 
       {/* Canceled row */}
-      <tr className="hover:bg-[#2a2d31]/60 transition-colors">
+      {/* <tr className="hover:bg-[#2a2d31]/60 transition-colors">
         <td className="px-6 py-4">2.</td>
         <td className="px-6 py-4 font-normal text-white">Riya</td>
         <td className="px-6 py-4">
@@ -145,16 +267,16 @@ const Admin = () => {
           </span>
         </td>
         <td className="px-6 py-4">Sep 15, 2025, 4:00 PM</td>
-        <td className="px-6 py-4">Dr. Shreya</td>
+        <td className="px-6 py-4">Dr. Ansh</td>
         <td className="px-6 py-4 text-center">
           <button className="text-blue-400 hover:text-blue-500 text-xs font-semibold tracking-wide transition-colors">
             Reschedule
           </button>
         </td>
-      </tr>
+      </tr> */}
 
       {/* Pending row */}
-      <tr className="hover:bg-[#2a2d31]/60 transition-colors">
+      {/* <tr className="hover:bg-[#2a2d31]/60 transition-colors">
         <td className="px-6 py-4">3.</td>
         <td className="px-6 py-4 font-normal text-white">Karan</td>
         <td className="px-6 py-4">
@@ -166,11 +288,11 @@ const Admin = () => {
         <td className="px-6 py-4">Oct 10, 2025, 11:00 AM</td>
         <td className="px-6 py-4">Dr. Aaradhya</td>
         <td className="px-6 py-4 text-center">
-          <button className="text-green-400 hover:text-green-500 text-xs font-semibold tracking-wide transition-colors">
+          <button className="text-green-400 hover:text-green-500 text-xs font-semibold tracking-wide transition-colors" onClick={handleModelBox}>
             Approve
           </button>
         </td>
-      </tr>
+      </tr> */}
 
     </tbody>
   </table>
@@ -187,7 +309,127 @@ const Admin = () => {
       </div>
       {/* hero section */}
 
-      Admin
+      {/* poup form */}
+     {appointmentScheduleBox && (
+  <div
+    className="fixed inset-0 z-50 flex justify-center items-center bg-black/70 backdrop-blur-sm"
+  >
+    <div className="form-box text-white bg-[rgb(19,21,25)] p-6 rounded-md border border-[rgb(54,54,54)] 
+                    w-[90%] sm:w-[80%] md:w-[60%] lg:w-[40%] max-h-[90vh] overflow-y-auto relative">
+
+      {/* Close Button */}
+      <svg
+        onClick={() => setAppointmentScheduleBox(false)}
+        xmlns="http://www.w3.org/2000/svg"
+        width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        className="absolute top-4 right-4 cursor-pointer"
+      >
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </svg>
+
+      <h2 className="text-base font-semibold">Schedule Appointment</h2>
+      <p className="text-xs text-[rgb(121,123,127)] mb-6">
+        Please fill in the following details to schedule an appointment
+      </p>
+
+      {/* Select Doctor */}
+      <div className="flex flex-col w-full gap-2 pb-4">
+        <label htmlFor="doctor" className="text-[rgb(121,123,127)] text-xs">
+          Select Doctor
+        </label>
+        <div className="flex items-center bg-[rgb(26,28,32)] border border-[rgb(54,54,54)] rounded-md">
+          <select
+            name="doctor"
+            className="bg-[rgb(26,28,32)] w-full py-3 px-3 rounded-md outline-none text-gray-400 text-xs"
+            value={appointmentData.doctor}
+            onChange={(e)=> setAppointmentData({...appointmentData,doctor:e.target.value})}
+          >
+            <option value="">Select a Doctor</option>
+            <option value="Dr. Harshit Bhardwaj">Dr. Harshit</option>
+            <option value="Dr. Ansh">Dr. Ansh</option>
+            <option value="Dr. Aaradhya">Dr. Aaradhya</option>
+            <option value="Dr. Aryan">Dr. Aryan</option>
+            <option value="Dr. Rohan">Dr. Rohan</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Appointment Date */}
+      <div className="flex flex-col w-full gap-2 pb-4">
+        <label htmlFor="expectedAppointmentDate" className="text-[rgb(121,123,127)] text-xs">
+          Expected Appointment Date
+        </label>
+        <div className="flex items-center bg-[rgb(26,28,32)] border border-[rgb(54,54,54)] rounded-md">
+          <svg
+            className="w-5 h-5 ml-2 text-gray-400"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" strokeWidth="2"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 001-1V7a1 1 0 00-1-1H5a1 1 0 00-1 1v12a1 1 0 001 1Z" />
+          </svg>
+         <input
+  type="datetime-local"
+  name="expectedAppointmentDate"
+  className="bg-[rgb(26,28,32)] w-full py-3 px-3 rounded-md outline-none text-gray-400 text-xs"
+  value={
+    appointmentData.expectedAppointmentDate
+      ? format(parseISO(appointmentData.expectedAppointmentDate), "yyyy-MM-dd'T'HH:mm")
+      : ""
+  }
+  onChange={(e) =>
+    setAppointmentData({
+      ...appointmentData,
+      // convert back to ISO for backend
+      expectedAppointmentDate: new Date(e.target.value).toISOString(),
+    })
+  }
+/>
+          {console.log(appointmentData.expectedAppointmentDate)}
+        </div>
+      </div>
+
+      {/* Submit Button */}
+      <button onClick={handleAppointmentApprove} className="w-full bg-[rgb(28,141,100)] py-3 text-gray-300 font-medium rounded-md text-xs my-4 hover:bg-[rgb(24,120,85)] transition">
+        Submit Appointment
+      </button>
+    </div>
+  </div>
+)}
+
+
+
+      {appointmentCancelBox && (
+         <div className="popup-form w-full min-h-screen bg-black/70 backdrop-blur-sm fixed top-0 flex justify-center items-center">
+        <div className="form-box text-white bg-[rgb(19,21,25)]  p-4 rounded-md border-[rgb(54,54,54)] border w-2/5 relative">
+
+          <h2 className='text-sm'>Cancel Appointment</h2>
+          <p className='text-xs text-[rgb(121,123,127)]'>Please fill in the following details to schedule appointment</p>
+          <svg onClick={()=>setAppointmentCancelBox(false)} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="absolute top-4 right-4 cursor-pointer"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+
+        {/* input box are */}
+         
+          <div className="imp-wrap flex flex-col w-full  gap-2 pt-8">
+
+        <label htmlFor="name" className={`text-[rgb(121,123,127)] text-xs`}>Reason for cancellation</label>
+        <div className={`inp-icon flex items-center bg-[rgb(26,28,32)] border-[rgb(54,54,54)] border rounded-md`}>
+         
+
+        <textarea onChange={(e)=> setAppointmentData({...appointmentData, cancelReason:e.target.value})}  name='expectedAppointmentDate' className='bg-[rgb(26,28,32)] w-full py-3 mx-2 rounded-md outline-none text-gray-400 text-xs placeholder:text-gray-600' placeholder='Urgent meeting came up' rows={5}></textarea>
+        </div>
+         </div>
+
+
+         <button className='w-full bg-[rgb(141,28,28)] py-3 text-gray-300 font-medium rounded-md text-xs my-4' onClick={handleAppointmentCancel}>Cancel Appointment</button>
+        </div>
+    </div>
+      )}
+   
+
+
+      {/* poup form */}
     </div>
   )
 }

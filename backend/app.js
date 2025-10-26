@@ -4,6 +4,7 @@ const Users = require('./models/Users');
 const Appointment = require('./models/Appointment');
 const app = express();
 const cors = require('cors');
+require('dotenv').config();
 const port = 3000;
 
 // Middleware to parse JSON bodies
@@ -12,7 +13,7 @@ app.use(cors());
 
 // database url
 
-const mongoURI = 'mongodb://localhost:27017/doctor-appointment';
+const mongoURI = process.env.MONGODB_URI||'mongodb://localhost:27017/doctor-appointment';
 
 // Connect to MongoDB
 mongoose.connect(mongoURI)
@@ -151,7 +152,7 @@ console.log(req.body)
 
 
     const appointment = new Appointment({
-      userEmail:email,
+      userId:user._id,
       doctor,
       expectedAppointmentDate,
       appointmentReason,
@@ -168,6 +169,45 @@ console.log(req.body)
   }
 });
 
+// Fetching appointment details
+
+app.get('/fetch-appointment-list', async (req, res) => {
+
+  const appointments = await Appointment.find().populate('userId', 'fullName').sort({ _id: -1 });;
+  // console.log(appointments)
+  return res.json({appointments, success: true})
+})
+
+// Approving appointment details
+
+app.put('/approve-appointment', async (req, res) => {
+  const {appointmentData, action} = req.body;
+  if(action === 'approve'){
+
+    const appointment = await Appointment.findById(appointmentData._id);
+
+
+    appointment.doctor = appointmentData.doctor,
+    appointment.expectedAppointmentDate = appointmentData.expectedAppointmentDate,
+    appointment.status = 'Scheduled'
+
+    await appointment.save();
+    console.log(appointment)
+
+    return res.json({message:"Appointment Approved", success:true})
+    
+  }else{
+    const appointment = await Appointment.findById(appointmentData._id)
+
+    appointment.status = 'Canceled',
+    appointment.cancelReason = appointmentData.cancelReason,
+
+    await appointment.save();
+
+    return res.json({message:"Appointment Canceled", success: true})
+  }
+
+})
 
 
 app.listen(port, () => {
