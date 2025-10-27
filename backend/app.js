@@ -213,8 +213,9 @@ app.put('/approve-appointment', async (req, res) => {
 
 app.post('/validate-user', async(req,res) => {
   const {otp} = req.body
+  console.log(req.body.join(''))
 
-  if (otp === 1990) {
+  if (req.body.join('') === '1990') {
     return res.json({message:"Welcome Admin", success: true})
   }else{
     return res.json({message:'Incorrect Passcode', success: false})

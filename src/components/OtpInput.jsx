@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-const server_url = 'https://doctor-appointment-by6x.onrender.com'||'http://localhost:3000'
+const server_url = 'http://localhost:3000'
 
 const OtpInput = ({setIsUserValid}) => {
   const inputsRef = useRef([]);
@@ -53,11 +53,11 @@ const OtpInput = ({setIsUserValid}) => {
     if (!response.data.success) {
       return toast.error(response.data.message)
     }
-    setIsUserValid(ture)
+    setIsUserValid(true)
     return toast.success(response.data.message)
     } catch (error) {
       toast.error("Internal Server Error")
-      console.error("Internal Server Error")
+      console.error("Internal Server Error",error)
     }
    
     
