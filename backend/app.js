@@ -209,6 +209,18 @@ app.put('/approve-appointment', async (req, res) => {
 
 })
 
+// Validataing Passcode
+
+app.post('/validate-user', async(req,res) => {
+  const {otp} = req.body
+
+  if (otp === 1990) {
+    return res.json({message:"Welcome Admin", success: true})
+  }else{
+    return res.json({message:'Incorrect Passcode', success: false})
+  }
+})
+
 
 app.listen(port, () => {
   console.log(`✅ Server Started: http://localhost:${port}`);

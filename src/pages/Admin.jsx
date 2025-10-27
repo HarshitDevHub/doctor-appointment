@@ -2,6 +2,7 @@ import axios from 'axios'
 import { format, parseISO } from "date-fns";
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import OtpInput from '../components/OtpInput'
 
 
 const server_url = 'https://doctor-appointment-by6x.onrender.com'||'http://localhost:3000'
@@ -11,6 +12,8 @@ const Admin = () => {
   const [appointmentCancelBox, setAppointmentCancelBox] = useState(false)
   const [appointments, setAppointments] = useState([])
   const [appointmentData, setAppointmentData] = useState(null)
+  const [isUserValid, setIsUserValid] = useState(false)
+
 
 
   useEffect(() => {
@@ -92,8 +95,16 @@ const Admin = () => {
     }
   }
 
+
+
+
   return (
-    <div className='main-container min-h-screen w-full !bg-[#131519]'>
+    <>
+    
+    {isUserValid ? (
+      <>
+      
+      <div className='main-container min-h-screen w-full !bg-[#131519]'>
 
       <div className="nav-bar w-10/12 bg-[#060809] p-4 mx-auto rounded-md flex justify-between">
 
@@ -431,6 +442,13 @@ const Admin = () => {
 
       {/* poup form */}
     </div>
+      </>
+
+    ):(
+    <OtpInput setIsUserValid={setIsUserValid}/>
+
+    )}
+    </>
   )
 }
 
